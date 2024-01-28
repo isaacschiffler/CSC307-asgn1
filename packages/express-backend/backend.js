@@ -22,7 +22,19 @@ const findUserById = (id) =>
 const addUser = (user) => {
   users["users_list"].push(user);
   return user;
-};  
+};
+
+const deleteUserById = (id) => {
+  const index = users['users_list'].findIndex((user) => user['id'] === id);
+
+  if (index !== -1) {
+    // Splice the user from the array and return the deleted user
+    return users['users_list'].splice(index, 1)[0];
+  } else {
+    // Return null if user is not found
+    return null;
+  }
+};
 
 app.get("/users", (req, res) => {
   const name = req.query.name;
@@ -49,6 +61,20 @@ app.post("/users", (req, res) => {
   const userToAdd = req.body;
   addUser(userToAdd);
   res.send();
+});
+
+app.delete('/users/:id', (req, res) => {
+  const id = req.params.id;
+  const deletedUser = deleteUserById(id);
+
+  if (deletedUser !== null) {
+    res.send({
+      message: 'User deleted successfully',
+      deletedUser: deletedUser,
+    });
+  } else {
+    res.status(404).send('User not found');
+  }
 });
 
 app.listen(port, () => {
