@@ -15,7 +15,13 @@ function MyApp() {
 
   function updateList(person) { 
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then(response => {
+        if (response.status === 201) {
+          setCharacters([...characters, person])
+        } else {
+          console.log('Failed to update list. Invalid HTTP Code (not 201).');
+        }
+      })
       .catch((error) => {
         console.log(error);
       })
