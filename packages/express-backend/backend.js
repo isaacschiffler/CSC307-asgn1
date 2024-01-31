@@ -28,7 +28,7 @@ const findUserById = (id) =>
   users["users_list"].find((user) => user["id"] === id);
 
 const addUser = (user) => {
-  user.id = Math.random().toString();
+  user.id = Math.random().toString();      //maybe double check this is sufficient and a generateID() function isn't necessary
   users["users_list"].push(user);
   return user;
 };
@@ -76,8 +76,9 @@ app.get("/users/:id", (req, res) => {
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.status(201).send('New user added');
+  const newUser = addUser(userToAdd);
+  
+  res.status(201).send({message: 'New user added', user: newUser});
 });
 
 app.delete('/users/:id', (req, res) => {
@@ -85,10 +86,7 @@ app.delete('/users/:id', (req, res) => {
   const deletedUser = deleteUserById(id);
 
   if (deletedUser !== null) {
-    res.send({
-      message: 'User deleted successfully',
-      deletedUser: deletedUser,
-    });
+    res.status(204).send();
   } else {
     res.status(404).send('User not found');
   }

@@ -7,20 +7,30 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   function removeOneCharacter(index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index;
-    });
-    setCharacters(updated);
+    deleteUser(characters[index])
+    .then(deleted => {
+      if (deleted.status === 204) {
+        const updated = characters.filter((character, i) => {
+          return i !== index;
+        });
+        setCharacters(updated);
+      } else {
+        console.log("Failed to delete user")
+      }
+    })
   }
 
   function updateList(person) { 
     postUser(person)
       .then(response => {
         if (response.status === 201) {
-          setCharacters([...characters, person])
+          return response.json();
         } else {
           console.log('Failed to update list. Invalid HTTP Code (not 201).');
         }
+      })
+      .then(updatedUser => {
+        setCharacters([...characters, updatedUser.user]);
       })
       .catch((error) => {
         console.log(error);
@@ -39,6 +49,17 @@ function MyApp() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(person),
+    });
+
+    return promise;
+  }
+
+  function deleteUser(person) {
+    const promise = fetch(("http://localhost:8000/users/" + person.id), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     return promise;
